@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abanoub & Marina — Royal Invitation</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+/* -------------------------------------------
+   ROYAL DYNAMIC THEME VARIABLES
+--------------------------------------------- */
+:root {
+  --bg-main: #02182b; /* Deep Royal Navy */
+  --bg-sec: #011222;
+  --gold-solid: #D4AF37; 
+  --gold-light: #F9F1CC;
+  --gold-dark: #AA7E24;
+  --gold-grad: linear-gradient(135deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+  
+  --cream: #FDF5E6; /* Light elegant touch */
+  
+  --text-main: #f4f6f8; 
+  --text-muted: #b0c4de;
+  --card-bg: rgba(2, 24, 43, 0.7);
+  --script: 'Great Vibes', cursive; 
+  --serif: 'Cormorant Garamond', serif; 
+  --sans: 'Jost', sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg-main); color:var(--text-main); font-family:var(--sans); font-weight:300; overflow-x:hidden;}
+
+/* Gold Text Utility Class */
+.gold-text {
+    background: var(--gold-grad);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0px 2px 10px rgba(191, 149, 63, 0.2);
+}
+
+/* -------------------------------------------
+   FALLING STARS BACKGROUND
+--------------------------------------------- */
+#stars-container { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; display: none; }
+#main-content.revealed ~ #stars-container { display: block; }
+.star {
+    position: absolute; background-color: var(--cream); border-radius: 50%;
+    box-shadow: 0 0 6px rgba(253, 245, 230, 0.8), 0 0 12px rgba(212, 175, 55, 0.6);
+    opacity: 0; animation: fallingStars linear infinite;
+}
+@keyframes fallingStars {
+    0% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+    10% { opacity: 1; transform: translateY(0) scale(1); }
+    80% { opacity: 1; }
+    100% { transform: translateY(110vh) scale(0.5); opacity: 0; }
+}
+
+/* -------------------------------------------
+   REALISTIC LUXURY ENVELOPE
+--------------------------------------------- */
+#envelope-overlay {
+    position: fixed; inset: 0;
+    background-color: #001524;
+    background-image: radial-gradient(#003153 2px, transparent 2px); 
+    background-size: 30px 30px;
+    z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: opacity 0.8s ease;
+}
+#envelope-overlay.opening { opacity: 0; pointer-events: none; }
+.env-wrap { position: relative; width: 350px; height: 240px; perspective: 2000px; transform-style: preserve-3d; filter: drop-shadow(0 25px 40px rgba(0,0,0,0.6)); }
+.env-back { position: absolute; inset: 0; background: #fafafa; border-radius: 8px; z-index: 1; border: 1px solid #ddd; }
+.env-card { position: absolute; left: 15px; right: 15px; top: 15px; bottom: 15px; background: #003153; border-radius: 5px; z-index: 2; padding: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.2); transition: transform 1s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.card-inner { border: 1px solid var(--gold-solid); height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.env-wrap.open .env-card { transform: translateY(-160px) scale(1.05) translateZ(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.env-left { position: absolute; inset: 0; background: #f4f4f4; clip-path: polygon(0 0, 50% 50%, 0 100%); z-index: 3; border-radius: 8px 0 0 8px; box-shadow: inset -5px 0 10px rgba(0,0,0,0.03); }
+.env-right { position: absolute; inset: 0; background: #f4f4f4; clip-path: polygon(100% 0, 50% 50%, 100% 100%); z-index: 3; border-radius: 0 8px 8px 0; box-shadow: inset 5px 0 10px rgba(0,0,0,0.03); }
+.env-bottom { position: absolute; inset: 0; background: #ededed; clip-path: polygon(0 100%, 50% 50%, 100% 100%); z-index: 4; border-radius: 0 0 8px 8px; box-shadow: inset 0 5px 15px rgba(0,0,0,0.05); }
+
+.env-flap-wrapper { position: absolute; top: 0; left: 0; right: 0; height: 65%; filter: drop-shadow(0 3px 1px #C9A84C); transform-origin: top center; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); z-index: 5; }
+.env-flap { width: 100%; height: 100%; background: #ffffff; clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 8px 8px 0 0; }
+.env-wrap.open .env-flap-wrapper { transform: rotateX(180deg); z-index: 1; filter: drop-shadow(0 -3px 1px #C9A84C); }
+
+.wax-seal { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 50px; height: 50px; background: linear-gradient(135deg, #e6c27a, #c9a84c, #997a2e); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-family: var(--script); font-size: 24px; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); border: 2px solid #b38f36; transition: opacity 0.3s ease; }
+.env-wrap.open .wax-seal { opacity: 0; }
+.env-hint { margin-top: 40px; color: var(--gold-solid); font-family: var(--sans); letter-spacing: 4px; text-transform: uppercase; font-size: 13px; animation: float 2s infinite; }
+
+/* -------------------------------------------
+   LIVE POLAROID & CONTROLS
+--------------------------------------------- */
+#flash-effect { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 10000; }
+.flash-anim { animation: cameraFlash 0.8s ease-out; }
+@keyframes cameraFlash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+#polaroid-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: none; align-items: flex-start; justify-content: center; padding-top: 15vh; cursor: pointer; backdrop-filter: blur(10px); }
+.polaroid-frame { background: white; padding: 15px 15px 50px 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); transform: translateY(-150vh) rotate(-15deg) scale(0.5); transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1); width: 300px; text-align: center; border: 1px solid #ddd; }
+#polaroid-overlay.show-print .polaroid-frame { transform: translateY(0) rotate(-4deg) scale(1); }
+.polaroid-frame img { width: 100%; height: 260px; object-fit: cover; filter: sepia(0.2) contrast(1.1); }
+.polaroid-caption { font-family: var(--script); font-size: 38px; color: #111; margin-top: 20px; }
+.polaroid-hint { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); color: white; font-family: var(--sans); font-size: 14px; white-space: nowrap; opacity: 0.7; }
+
+/* STROBE EFFECT FOR NEW SECTION */
+#strobe-effect { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 9995; display: none; }
+.strobe-anim { animation: strobeFlash 0.3s infinite alternate; }
+@keyframes strobeFlash { 0% { opacity: 0; } 100% { opacity: 0.6; } }
+
+.music-btn{position:fixed; bottom:20px; right:20px; background:var(--gold-grad); color:var(--bg-main); border:none; padding:12px 25px; border-radius:50px; cursor:pointer; z-index:1000; font-family:var(--sans); font-size:14px; font-weight:600; box-shadow:0 5px 20px rgba(0,0,0,0.5); transition:transform 0.3s, box-shadow 0.3s; display:none; align-items:center; gap:8px;}
+.music-btn.visible{display:flex; animation: popIn 0.5s ease;}
+.music-btn:hover{transform: translateY(-3px); box-shadow:0 8px 25px rgba(212, 175, 55, 0.4);}
+
+/* GENERAL ANIMATIONS */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes popIn { 0% { opacity:0; transform:scale(0.5); } 100% { opacity:1; transform:scale(1); } }
+.fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* MAIN CONTENT */
+#main-content{position:relative; z-index:1; transform:translateY(100vh); opacity:0; transition:transform 1.2s cubic-bezier(.2,1,.3,1), opacity 1s ease;}
+#main-content.revealed{transform:translateY(0);opacity:1}
+
+/* HERO SECTION */
+#hero{min-height:100svh; background: radial-gradient(circle at center, rgba(2, 24, 43, 0.6) 0%, rgba(1, 14, 26, 0.95) 100%), url('couple.jpg') center/cover no-repeat; display:flex;flex-direction:column; align-items:center;justify-content:center; text-align:center; padding:2rem 1.5rem; position:relative;}
+.hero-names{font-family:var(--script); font-size:clamp(45px, 12vw, 85px); margin-bottom:0.8rem; line-height: 1.2;}
+.hero-date{font-family:var(--sans); font-size:13px; letter-spacing:6px; color:var(--cream); border-top:1px solid rgba(212,175,55,0.4); border-bottom:1px solid rgba(212,175,55,0.4); padding:.8rem 2rem; text-transform: uppercase; font-weight: 500;}
+
+.animate-slide-up { opacity:0; }
+#main-content.revealed .animate-slide-up { animation: slideUp 1.2s cubic-bezier(0.2,1,0.3,1) forwards; }
+#main-content.revealed .animate-slide-up-delayed { animation: slideUp 1.2s cubic-bezier(0.2,1,0.3,1) 0.8s forwards; opacity:0; }
+
+/* SMALLER COUNTDOWN BOXES */
+.countdown-wrap { display: flex; justify-content: center; gap: 12px; margin-top: 3.5rem; flex-wrap: wrap; }
+.cd-box { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(212,175,55,0.3); border-radius: 8px; padding: 10px 15px; min-width: 70px; text-align: center; box-shadow: inset 0 0 10px rgba(212,175,55,0.1), 0 5px 20px rgba(0,0,0,0.5); position: relative;}
+.cd-box::before { content: ''; position: absolute; inset: 3px; border: 1px dashed rgba(212,175,55,0.2); pointer-events: none; }
+.cd-box span { font-family: var(--serif); font-size: 28px; display: block; line-height: 1; margin-bottom: 5px; font-weight: 400; color: var(--cream);}
+.cd-box p { font-family: var(--sans); font-size: 9px; text-transform: uppercase; letter-spacing: 2px; margin: 0; color: var(--gold-solid); }
+
+/* SECTIONS */
+.section{padding:6rem 1.5rem; max-width:700px; margin:0 auto; position:relative;}
+.section-title{font-family:var(--script); font-size:clamp(42px,10vw,70px); text-align:center; margin-bottom:1.5rem;}
+.divider{display:flex;align-items:center;gap:1.5rem;margin:0 auto 3.5rem;max-width:350px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gold-grad); opacity:0.6;}
+.divider span{color:var(--gold-solid);font-size:20px}
+
+/* OUR STORY */
+.story-intro { text-align: center; color: var(--cream); font-family: var(--serif); font-size: 19px; font-style: italic; margin-bottom: 3.5rem; line-height: 1.6; max-width: 550px; margin-inline: auto; opacity: 0.9; }
+.couple-portraits { display: flex; justify-content: center; align-items: center; gap: 3rem; margin-bottom: 3rem; flex-wrap: wrap; }
+.portrait-wrap { text-align: center; }
+.portrait-img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2px dashed rgba(212,175,55,0.5); padding: 5px; margin-bottom: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: all 0.5s; background: transparent; }
+.portrait-wrap:hover .portrait-img { transform: scale(1.05); border-style: solid; border-color: var(--gold-solid); background: rgba(212,175,55,0.1); }
+.portrait-name { font-family: var(--serif); font-size: 26px; font-weight: 500; color: var(--cream); letter-spacing: 2px; }
+
+.capture-btn-wrap { text-align: center; margin-bottom: 5rem; }
+.capture-btn { background: var(--gold-grad); color: var(--bg-main); border: none; padding: 14px 30px; border-radius: 50px; font-family: var(--sans); font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px;}
+.capture-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.4); }
+
+/* Elegant Timeline */
+.timeline { position: relative; padding-left: 2rem; margin: 0 auto; max-width: 500px; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 10px; bottom: 0; width: 1px; background: linear-gradient(to bottom, var(--gold-solid) 0%, rgba(212,175,55,0.1) 100%); opacity: 0.5; }
+.timeline-item { position: relative; margin-bottom: 3.5rem; padding-left: 2rem; }
+.timeline-dot { position: absolute; left: -6px; top: 6px; width: 13px; height: 13px; border-radius: 50%; background: var(--bg-main); border: 2px solid var(--gold-solid); box-shadow: 0 0 12px rgba(212,175,55,0.6); transition: transform 0.4s; }
+.timeline-item:hover .timeline-dot { transform: scale(1.4); background: var(--gold-solid); }
+.tl-date { color: var(--gold-solid); font-family: var(--sans); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 5px; }
+.tl-title { color: var(--cream); font-family: var(--serif); font-size: 26px; font-style: italic; margin-bottom: 8px; line-height: 1.2; }
+.tl-desc { color: var(--text-muted); font-size: 15px; font-family: var(--sans); line-height: 1.6; }
+
+.romantic-frame { display: inline-block; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(212,175,55,0.2); border-radius: 8px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.romantic-frame::before { content:''; position:absolute; inset: 5px; border: 1px dashed rgba(212,175,55,0.4); border-radius: 4px; pointer-events: none; }
+.romantic-frame img { display: block; width: 100%; max-width: 420px; border-radius: 4px; filter: contrast(1.05) brightness(0.95); transition: filter 0.5s; }
+.romantic-frame:hover img { filter: contrast(1.1) brightness(1); }
+
+/* PROGRAMME */
+.programme-wrap { position: relative; max-width: 500px; margin: 0 auto; padding-left: 40px; }
+.programme-wrap::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px; background: var(--gold-solid); opacity: 0.3; }
+.prog-item-chic { position: relative; background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 1px solid rgba(212,175,55,0.15); transition: all 0.4s; display: flex; align-items: center; gap: 20px; }
+.prog-item-chic::after { content:''; position: absolute; inset: 4px; border: 1px dashed rgba(212,175,55,0.1); border-radius: 8px; pointer-events: none;}
+.prog-item-chic::before { content: ''; position: absolute; left: -46px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--gold-solid); border: 3px solid var(--bg-sec); box-shadow: 0 0 0 1px var(--gold-solid); z-index: 2; transition: all 0.3s; }
+.prog-item-chic:hover { transform: translateY(-8px); box-shadow: 0 20px 45px rgba(0,0,0,0.5); border-color: rgba(212,175,55,0.4); }
+.prog-icon-chic { width: 55px; height: 55px; border-radius: 50%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; border: 1px solid rgba(212,175,55,0.3); transition: transform 0.5s; }
+.prog-item-chic:hover .prog-icon-chic { transform: rotate(15deg) scale(1.1); background: var(--gold-grad); color: var(--bg-main); border-color: transparent;}
+.prog-details-chic { display: flex; flex-direction: column; gap: 6px; }
+.prog-time-chic { font-family: var(--sans); font-size: 12px; letter-spacing: 3px; color: var(--gold-solid); font-weight: 500; text-transform: uppercase; }
+.prog-title-chic { font-family: var(--serif); font-size: 22px; color: var(--cream); font-style: italic; }
+
+/* ROYAL PREMIUM CARDS */
+.premium-card {
+    background: var(--card-bg); backdrop-filter: blur(12px);
+    border: 1px solid var(--gold-solid);
+    box-shadow: inset 0 0 0 6px rgba(2, 24, 43, 1), inset 0 0 0 7px rgba(212,175,55,0.4), 0 20px 50px rgba(0,0,0,0.6);
+    padding: 3.5rem 2rem; text-align:center; border-radius: 4px;
+    margin-bottom: 2rem; position:relative; overflow:hidden;
+}
+
+/* Map Card Override */
+.map-card { padding: 0.5rem; height: 300px; margin-bottom: 2rem; }
+.map-card iframe { border-radius: 2px; filter: grayscale(0.5) contrast(1.1) brightness(0.8) sepia(0.3) hue-rotate(180deg); transition: filter 0.3s; }
+.map-card iframe:hover { filter: grayscale(0) contrast(1) brightness(1) sepia(0) hue-rotate(0deg); }
+
+/* BUTTONS */
+.btn-outline{padding:14px 28px; border-radius:4px; border:1px solid var(--gold-solid); font-family:var(--sans); font-size:13px; letter-spacing:3px; text-transform:uppercase; color: var(--cream); background:transparent; cursor:pointer; text-decoration:none; transition:0.3s; font-weight: 500; position: relative; overflow: hidden;}
+.btn-outline::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--gold-grad); z-index: -1; transition: opacity 0.3s; opacity: 0; }
+.btn-outline:hover{color:var(--bg-main); border-color:transparent; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(212,175,55,0.2);}
+.btn-outline:hover::before { opacity: 1; }
+
+/* RSVP FORM */
+.rsvp-form{display:flex;flex-direction:column;gap:2rem; position: relative; z-index: 1;}
+.input-group { text-align: left; }
+.input-group label { display: block; font-size: 11px; text-transform: uppercase; color:var(--gold-solid); font-weight:500; letter-spacing:2px; margin-bottom: 8px; }
+input:not(.chat-input), select{width:100%;padding:14px;border:none; border-bottom: 1px solid rgba(212,175,55,0.4); border-radius:0; outline:none; font-family:var(--sans); background: rgba(0,0,0,0.2); color: var(--cream); transition: all 0.3s; font-size: 15px;}
+input:not(.chat-input)::placeholder { color: #888; font-style: italic; font-family: var(--serif); font-size: 16px;}
+input:not(.chat-input):focus, select:focus { border-bottom-color: var(--gold-solid); background: rgba(0,0,0,0.4); }
+.submit-btn{background:var(--gold-grad);color:var(--bg-main);padding:1.2rem;border:none;border-radius:4px;cursor:pointer;font-weight:600;letter-spacing:3px; font-family:var(--sans); transition: 0.3s; text-transform: uppercase; margin-top: 1rem;}
+.submit-btn:hover{transform:translateY(-2px); box-shadow: 0 10px 25px rgba(212,175,55,0.3);}
+
+/* FOOTER */
+footer{text-align:center; padding:4rem 1.5rem; background: var(--bg-sec); border-top: 1px solid rgba(212,175,55,0.2);}
+
+/* -------------------------------------------
+   ORIGINAL HEARTS POPPING GAME STYLES
+--------------------------------------------- */
+.game-heart { position: absolute; font-size: 35px; cursor: pointer; user-select: none; transition: transform 0.1s; z-index: 5; }
+#gameArea { position: relative; width: 100%; height: 400px; background: rgba(255, 255, 255, 0.05); border-radius: 20px; border: 2px dashed var(--gold-solid); overflow: hidden; cursor: crosshair; box-shadow: inset 0 0 25px rgba(0,0,0,0.3); margin: 0 auto; max-width: 500px; }
+#gameStartText { font-family: var(--sans); font-size: 28px; color: var(--gold-solid); font-weight: bold; cursor: pointer; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop preload="auto"><source src="song.mp3" type="audio/mpeg"></audio>
+<audio id="cameraSound" preload="auto"><source src="camera_sound.mp3" type="audio/mpeg"></audio>
+<audio id="surpriseAudio" preload="auto"><source src="surprise_song.mp3" type="audio/mpeg"></audio>
+
+<canvas id="fireworksCanvas"></canvas>
+<div id="flash-effect"></div>
+<div id="strobe-effect"></div>
+
+<div id="polaroid-overlay">
+  <div class="polaroid-frame">
+    <img id="polaroid-img" src="polaroid_pic.jpg" alt="Polaroid Memory">
+    <p class="polaroid-caption">August 30, 2026</p>
+    <div class="polaroid-hint">Tap anywhere to close</div>
+  </div>
+</div>
+
+<button class="music-btn" id="musicBtn">⏸ Pause</button>
+
+<div id="envelope-overlay">
+  <div class="env-wrap" id="envWrap">
+    <div class="env-back"></div>
+    <div class="env-card">
+      <div class="card-inner">
+        <h3 class="gold-text" style="font-Fira Code:var(--script); font-size:36px; margin:0; line-height:1;">A & M</h3>
+        <p style="font-family:var(--sans); font-size:9px; letter-spacing:4px; color:var(--cream); margin-top:10px; text-transform:uppercase; font-weight:500;">You're Invited</p>
+      </div>
+    </div>
+    <div class="env-left"></div>
+    <div class="env-right"></div>
+    <div class="env-bottom"></div>
+    <div class="env-flap-wrapper">
+        <div class="env-flap"></div>
+        <div class="wax-seal">A</div>
+    </div>
+  </div>
+  <div class="env-hint">Tap to open</div>
+</div>
+
+<div id="main-content">
+  <section id="hero">
+    <p class="animate-slide-up" style="color:var(--gold-solid); letter-spacing:6px; text-transform:uppercase; font-size:11px; margin-bottom:1.2rem; font-weight: 500;">We are getting married</p>
+    <h1 class="hero-names gold-text animate-slide-up-delayed">Abanoub & Marina</h1>
+    <p class="hero-date animate-slide-up-delayed">August 30, 2026</p>
+    
+    <div class="countdown-wrap animate-slide-up-delayed">
+      <div class="cd-box"><span id="cd-days">00</span><p>Days</p></div>
+      <div class="cd-box"><span id="cd-hours">00</span><p>Hours</p></div>
+      <div class="cd-box"><span id="cd-mins">00</span><p>Minutes</p></div>
+      <div class="cd-box"><span id="cd-secs">00</span><p>Seconds</p></div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="story">
+    <h2 class="section-title gold-text">Our Story</h2>
+    <div class="divider"><span>✦</span></div>
+
+    <p class="story-intro fade-in">
+      Every love story is beautiful, but ours is our favorite. Two souls, one journey, writing a forever chapter together.
+    </p>
+
+    <div class="couple-portraits fade-in">
+        <div class="portrait-wrap"><img src="abanob.jpg" alt="Abanoub" class="portrait-img"><p class="portrait-name">Abanoub</p></div>
+        <div class="portrait-wrap"><img src="marina.jpg" alt="Marina" class="portrait-img"><p class="portrait-name">Marina</p></div>
+    </div>
+
+    <div class="capture-btn-wrap fade-in">
+        <button class="capture-btn" id="captureBtn">📸 Capture a Memory</button>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <p class="tl-date">November 2015</p>
+          <p class="tl-title">How It All Began</p>
+          <p class="tl-desc">Our story began. The first time we met and the start of everything, a spark that would last a lifetime.</p>
+      </div>
+      <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <p class="tl-date">February 18, 2023</p>
+          <p class="tl-title">The Engagement</p>
+          <p class="tl-desc">A beautiful promise to walk through life together. He asked, and she said yes.</p>
+      </div>
+      <div class="timeline-item fade-in">
+          <div class="timeline-dot"></div>
+          <p class="tl-date">August 30, 2026</p>
+          <p class="tl-title">The Big Day</p>
+          <p class="tl-desc">Surrounded by our loved ones, we begin our forever chapter.</p>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:4.5rem;" class="fade-in">
+      <div class="romantic-frame">
+          <img src="couple.jpg" alt="Abanob & Marina">
+      </div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="programme" style="background:var(--bg-sec)">
+    <h2 class="section-title gold-text">The Programme</h2>
+    <div class="divider"><span>✦</span></div>
+    
+    <div class="programme-wrap">
+      <div class="prog-item-chic fade-in"><div class="prog-icon-chic">💍</div><div class="prog-details-chic"><span class="prog-time-chic">6:30 PM</span><span class="prog-title-chic">Holy Matrimony Ceremony</span></div></div>
+      <div class="prog-item-chic fade-in"><div class="prog-icon-chic">📸</div><div class="prog-details-chic"><span class="prog-time-chic">8:00 PM</span><span class="prog-title-chic">Wedding Photos & Greetings</span></div></div>
+      <div class="prog-item-chic fade-in"><div class="prog-icon-chic">🥂</div><div class="prog-details-chic"><span class="prog-time-chic">End of Event</span><span class="prog-title-chic">Wedding Farewell & Conclusion</span></div></div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="location">
+    <h2 class="section-title gold-text">The Venue</h2>
+    <div class="divider"><span>✦</span></div>
+    
+    <div style="text-align:center; margin-bottom: 2.5rem;" class="fade-in">
+      <p style="font-size:28px; font-family:var(--serif); color:var(--cream); margin-bottom: 10px; font-style: italic;">Sunday, August 30, 2026</p>
+      <p style="font-size:18px; font-family:var(--sans); color:var(--gold-solid); font-weight: 500; margin-bottom: 20px; letter-spacing: 2px;">6:30 PM</p>
+      <p style="color:var(--text-main); font-size: 18px; margin-bottom: 20px; line-height: 1.8; font-family:var(--serif);">الكاتدرائية المرقسية<br>محطة الرمل، الإسكندرية</p>
+      <p style="color:var(--gold-solid); font-family:var(--sans); font-size: 13px; letter-spacing: 4px; font-weight: 600;">RSVP AT 123-456-7890</p>
+    </div>
+    
+    <div class="premium-card map-card fade-in">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3412.3996766488734!2d29.897645011776517!3d31.20163356230983!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f5c3f309a63319%3A0xc3ec5017e923e206!2sSt.%20Mark's%20Coptic%20Orthodox%20Cathedral!5e0!3m2!1sen!2seg!4v1714415000000!5m2!1sen!2seg" width="100%" height="100%" style="border:0; position:relative; z-index:1;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+    
+    <div style="display:flex; gap:1.5rem; justify-content:center; flex-wrap:wrap;">
+      <a href="https://maps.app.goo.gl/Z1J1J3Bi7EKydizRA" target="_blank" class="btn-outline">📍 Open in Maps</a>
+      <button class="btn-outline" onclick="addToCalendar()">📅 Add to Calendar</button>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="heart-game" style="text-align:center;">
+    <div class="premium-card" style="padding: 3.5rem 2rem;">
+      <h3 style="color:var(--cream); margin-bottom:1rem; font-family:var(--serif); font-size:38px; font-weight:bold; letter-spacing: 1px;">جمع 10 قلوب ❤️</h3>
+      <p id="gameScore" style="font-family: var(--sans); font-size:16px; font-weight:500; color:var(--gold-solid); margin-bottom:1.5rem; letter-spacing: 1px;">Score: 0 / 10</p>
+      
+      <div id="gameArea">
+        <div id="gameStartText" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; width: 100%;">Pop 10 Hearts!</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="surprise">
+    <div class="premium-card" style="padding: 3rem 2rem; text-align: center;">
+        <button id="surpriseBtn" class="submit-btn" style="font-size: 20px; padding: 15px 40px;">دوس هنا 🕺💃</button>
+        <div id="surprise-countdown" style="font-size: 80px; font-weight: bold; color: var(--gold-solid); display: none; font-family: var(--sans); animation: popIn 0.5s ease;">3</div>
+        <div id="surprise-content" style="display: none; margin-top: 20px;">
+            <img src="surprise_pic.jpg" alt="Surprise!" style="width: 100%; max-width: 400px; border-radius: 10px; border: 3px solid var(--gold-solid); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+        </div>
+    </div>
+  </section>
+
+  <section class="section fade-in" id="rsvp" style="background:var(--bg-sec)">
+    <h2 class="section-title gold-text">RSVP</h2>
+    <div class="divider"><span>✦</span></div>
+    
+    <div class="premium-card" style="padding: 3rem 2rem; background: var(--bg-main);">
+        <form class="rsvp-form" onsubmit="sendRSVP(event)">
+          <div class="input-group">
+            <label>الاسم بالكامل</label>
+            <input type="text" id="rsvpName" placeholder="Enter your full name" required>
+          </div>
+          
+          <div class="input-group">
+            <label> اكتبلنا امنية 💖🙏</label>
+            <input type="text" id="rsvpWish" placeholder="Write your warm wish for the couple">
+          </div>
+
+          <div class="input-group">
+              <label>Attendance</label>
+              <select id="rsvpAttendance" style="color:var(--cream)">
+                  <option value=❤️"جى طبعا">جى طبعا</option>
+                  <option value=🙈"اكيد طبعا جي">اكيد طبعا جي</option>
+              </select>
+          </div>
+          
+          <button type="submit" class="submit-btn">Send RSVP</button>
+        </form>
+    </div>
+  </section>
+
+  <footer>
+      <p class="gold-text" style="font-family:var(--script); font-size:36px; margin-bottom: 10px;">Abanoub & Marina</p>
+      <p style="color:var(--text-muted); font-family:var(--sans); letter-spacing: 5px; font-size: 11px;">30 . 08 . 2026</p>
+  </footer>
+</div>
+
+<div id="stars-container"></div>
+
+<script>
+// --- 0. FALLING STARS GENERATOR ---
+const starsContainer = document.getElementById('stars-container');
+for (let i = 0; i < 60; i++) {
+    let star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + 'vw';
+    star.style.top = (Math.random() * -100) + 'vh';
+    star.style.animationDuration = (Math.random() * 5 + 4) + 's';
+    star.style.animationDelay = (Math.random() * 5) + 's';
+    let size = Math.random() * 2 + 1;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    starsContainer.appendChild(star);
+}
+
+// --- 1. POLAROID PRINT LOGIC ---
+const captureBtn = document.getElementById('captureBtn');
+const flashEffect = document.getElementById('flash-effect');
+const polaroidOverlay = document.getElementById('polaroid-overlay');
+const cameraSound = document.getElementById('cameraSound');
+
+captureBtn.addEventListener('click', () => {
+    cameraSound.play().catch(e=>console.log("Audio play blocked"));
+    flashEffect.classList.add('flash-anim');
+    setTimeout(() => { flashEffect.classList.remove('flash-anim'); }, 800);
+    polaroidOverlay.style.display = 'flex';
+    setTimeout(() => { polaroidOverlay.classList.add('show-print'); }, 50);
+});
+polaroidOverlay.addEventListener('click', () => {
+    polaroidOverlay.classList.remove('show-print');
+    setTimeout(() => { polaroidOverlay.style.display = 'none'; }, 1000);
+});
+
+// --- 2. AUDIO LOGIC ---
+const bgMusic = document.getElementById('bgMusic');
+const musicBtn = document.getElementById('musicBtn');
+let isMusicPlaying = false;
+
+musicBtn.addEventListener('click', () => {
+  if (isMusicPlaying) { bgMusic.pause(); musicBtn.innerHTML = '🎵 Play Music'; }
+  else { bgMusic.play(); musicBtn.innerHTML = '⏸ Pause Music'; }
+  isMusicPlaying = !isMusicPlaying;
+});
+
+// --- 3. ENVELOPE LOGIC ---
+const envOverlay = document.getElementById('envelope-overlay');
+if(envOverlay) {
+  envOverlay.addEventListener('click', () => {
+    bgMusic.play().then(() => { isMusicPlaying = true; musicBtn.innerHTML = '⏸ Pause Music'; }).catch(e=>console.log("Audio play blocked"));
+    
+    document.getElementById('envWrap').classList.add('open');
+    setTimeout(() => {
+      envOverlay.classList.add('opening');
+      setTimeout(() => { 
+        envOverlay.style.display = 'none'; 
+        document.getElementById('main-content').classList.add('revealed'); 
+        musicBtn.classList.add('visible'); 
+      }, 800);
+    }, 2600); 
+  });
+}
+
+// --- 4. ORIGINAL POP 10 HEARTS GAME LOGIC ---
+const gameArea = document.getElementById('gameArea');
+const scoreEl = document.getElementById('gameScore');
+const startText = document.getElementById('gameStartText');
+let score = 0; 
+let isGameRunning = false; 
+let gameInterval;
+
+if (gameArea) {
+    gameArea.addEventListener('click', (e) => {
+        // تشغيل اللعبة عند الضغط لأول مرة
+        if(!isGameRunning) { 
+            score = 0; 
+            isGameRunning = true; 
+            startText.style.display = 'none'; 
+            gameInterval = setInterval(spawnHeart, 750); 
+            spawnHeart(); 
+            return; 
+        }
+        
+        // عند الضغط على قلب طائر بنجاح
+        if(e.target.classList.contains('game-heart')) {
+            score++; 
+            scoreEl.innerText = `Score: ${score} / 10`;
+            
+            // تأثير كونفيتي مصغر مكان نقرة الصيد
+            confetti({ particleCount: 15, spread: 40, origin: { x: e.clientX/window.innerWidth, y: e.clientY/window.innerHeight } });
+            e.target.remove();
+            
+            // عند الوصول للضغطة العاشرة والفوز باللعبة
+            if(score === 10) {
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9996, colors: ['#D4AF37', '#ff0000', '#FDF5E6', '#AA7E24'] };
+                const interval = setInterval(() => {
+                    confetti(Object.assign({}, defaults, { particleCount: 50, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+                }, 250);
+                setTimeout(() => clearInterval(interval), 2500);
+                
+                isGameRunning = false; 
+                clearInterval(gameInterval);
+                
+                // تفريغ اللوحة وعرض الكلمة النهائية فورا
+                while (gameArea.firstChild) gameArea.removeChild(gameArea.firstChild);
+                startText.style.display = 'block'; 
+                startText.innerText = "هنستناك ❤️"; 
+                gameArea.appendChild(startText);
+            } else { 
+                spawnHeart(); 
+            }
+        }
+    });
+}
+
+function spawnHeart() {
+    if(!isGameRunning || score >= 10) return;
+    const heart = document.createElement('div'); 
+    heart.classList.add('game-heart'); 
+    heart.innerText = '❤️';
+    
+    // حساب الموضع العشوائي لتجنب الخروج عن الإطار الملكي المخصص للعبة
+    heart.style.left = Math.random() * (gameArea.clientWidth - 45) + 'px'; 
+    heart.style.top = Math.random() * (gameArea.clientHeight - 45) + 'px';
+    
+    gameArea.appendChild(heart);
+    
+    // يختفي القلب تلقائياً بعد ثانية و 800 ملي ثانية لو محدش لحقه
+    setTimeout(() => { if(heart.parentNode) heart.remove(); }, 1800);
+}
+
+// --- 5. SURPRISE SECTION LOGIC ---
+const surpriseBtn = document.getElementById('surpriseBtn');
+const surpriseCountdown = document.getElementById('surprise-countdown');
+const surpriseContent = document.getElementById('surprise-content');
+const surpriseAudio = document.getElementById('surpriseAudio');
+const strobeEffect = document.getElementById('strobe-effect');
+
+if(surpriseBtn) {
+  surpriseBtn.addEventListener('click', () => {
+      surpriseBtn.style.display = 'none';
+      surpriseCountdown.style.display = 'block';
+      let count = 3;
+      surpriseCountdown.innerText = count;
+
+      const countdownInterval = setInterval(() => {
+          count--;
+          if (count > 0) {
+              surpriseCountdown.style.animation = 'none';
+              void surpriseCountdown.offsetWidth; 
+              surpriseCountdown.style.animation = 'popIn 0.5s ease';
+              surpriseCountdown.innerText = count;
+          } else {
+              clearInterval(countdownInterval);
+              surpriseCountdown.style.display = 'none';
+              surpriseContent.style.display = 'block';
+
+              bgMusic.pause();
+              isMusicPlaying = false;
+              musicBtn.innerHTML = '🎵 Play Music';
+              
+              surpriseAudio.play().catch(e => console.log("Surprise audio blocked"));
+              strobeEffect.style.display = 'block';
+              strobeEffect.classList.add('strobe-anim');
+
+              triggerFireworks();
+          }
+      }, 1000);
+  });
+}
+
+if(surpriseAudio) {
+  surpriseAudio.addEventListener('ended', () => {
+      strobeEffect.classList.remove('strobe-anim');
+      strobeEffect.style.display = 'none';
+      
+      bgMusic.play().then(() => {
+          isMusicPlaying = true;
+          musicBtn.innerHTML = '⏸ Pause Music';
+      }).catch(e => console.log("Audio resume blocked"));
+  });
+}
+
+function triggerFireworks() {
+    var duration = 3 * 1000;
+    var animationEnd = Date.now() + duration;
+    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9996, colors: ['#D4AF37', '#FDF5E6', '#AA7E24', '#ffffff'] };
+
+    function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+    var interval = setInterval(function() {
+        var timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        
+        var particleCount = 50 * (timeLeft / duration);
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+    }, 250);
+}
+
+// --- 6. RSVP WHATSAPP LOGIC ---
+function sendRSVP(event) {
+    event.preventDefault(); 
+    
+    const phoneNumber = "201284589595"; 
+
+    const name = document.getElementById('rsvpName').value;
+    const wish = document.getElementById('rsvpWish').value || 'مفيش أمنية معينة';
+    const attendance = document.getElementById('rsvpAttendance').value;
+
+    const message = `أهلاً أبانوب ومارينا! 🥳\n\nأنا: ${name}\nحالة الحضور: ${attendance}\nأمنيتي ليكم: ${wish}\n\nألف مبروك يا غاليين! ❤️`;
+
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+
+    confetti();
+
+    setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+    }, 1200);
+}
+
+// --- 7. SCROLL ANIMATION ---
+const fadeEls = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 });
+fadeEls.forEach(el => observer.observe(el));
+
+// --- 8. COUNTDOWN ---
+const weddingDate = new Date("Aug 30, 2026 18:30:00").getTime();
+setInterval(() => {
+  const distance = weddingDate - new Date().getTime();
+  if (distance < 0) return;
+  document.getElementById("cd-days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+  document.getElementById("cd-hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+  document.getElementById("cd-mins").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+  document.getElementById("cd-secs").innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+}, 1000);
+
+// --- 9. CALENDAR ---
+function addToCalendar(){
+  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=Abanoub%20%26%20Marina%20Wedding&dates=20260830T183000/20260830T213000&location=St.%20Mark's%20Coptic%20Orthodox%20Cathedral,%20Alexandria`, '_blank');
+}
+
+/* -------------------------------------------
+   🛡️ PREMIUM CODE PROTECTION & ANTI-THEFT SYSTEM
+--------------------------------------------- */
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        return false;
+    }
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        return false;
+    }
+    if (e.ctrlKey && e.keyCode === 83) {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+</body>
+</html>
